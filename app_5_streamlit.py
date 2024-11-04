@@ -28,10 +28,10 @@ st.title("Amazon Shopping Recommendation")
 @st.cache_resource
 def load_data():
         # Load the documents
-        loader = CSVLoader(file_path="Grocery_and_Gourmet_Food_filtered_1000.csv")
+        loader = CSVLoader(file_path="Grocery_and_Gourmet_Food_filtered_1000.csv") #make it 20k
 
         # build embeddings model via OpenAI API
-        embeddings_model = OpenAIEmbeddings(api_key=api_key) 
+        embeddings_model = OpenAIEmbeddings(api_key=api_key) # replace openAI emebeddings with local [FaiSS, Ollama: nomic-embed-text, mxbai-embed-large, snowflake-arctic-embed] embeddings which will train on GPU
 
         # Create an index using the loaded documents with the correct embeddings model
         index_creator = VectorstoreIndexCreator(embedding=embeddings_model)
@@ -42,10 +42,12 @@ def load_data():
 docsearch = load_data()
 
 # Create a question-answering chain using the index
-chain = RetrievalQA.from_chain_type(llm=OpenAI(api_key=api_key),\
-                                    chain_type="stuff",\
-                                    retriever=docsearch.vectorstore.as_retriever(),\
-                                    input_key="question")
+chain = RetrievalQA.from_chain_type(
+    llm=OpenAI(api_key=api_key),\
+    chain_type="stuff",\
+    retriever=docsearch.vectorstore.as_retriever(),\
+    input_key="question"
+)
 
 # User input
 input_dish = st.text_input("Enter the dish you want to cook:",\
